@@ -1,8 +1,11 @@
+use glam::Vec2;
 use minifb::{self, Key};
 
 use crate::script::Script;
+use crate::turtle::{Command, Turtle};
 
 pub struct Window {
+    turtle: Turtle,
     script: Script,
     width: usize,
     height: usize,
@@ -25,6 +28,7 @@ impl Window {
         // Limit to max ~60 fps update rate
         window.limit_update_rate(Some(std::time::Duration::from_micros(16600)));
         Self {
+            turtle: Turtle::new(Vec2::new((width / 2) as f32, (height / 2) as f32)),
             script: Script::new(script_path),
             elapsed_updates: 0,
             window,
@@ -36,9 +40,23 @@ impl Window {
     }
 
     pub fn run(&mut self) {
+        let commands = vec![
+            Command::Move(50),
+            Command::Turn(90),
+            Command::Move(50),
+            Command::Turn(90),
+        ];
+        self.init(Some(&commands));
+
         while !self.should_stop && self.window.is_open() {
             self.update();
             self.draw();
+        }
+    }
+
+    pub fn init(&mut self, commands: Option<&[Command]>) {
+        if let Some(commands) = commands {
+            self.turtle.apply_commands(commands);
         }
     }
 

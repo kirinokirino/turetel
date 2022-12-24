@@ -1,7 +1,8 @@
 #![warn(clippy::nursery)]
 
-mod window;
 mod script;
+mod turtle;
+mod window;
 
 use crate::window::Window;
 
