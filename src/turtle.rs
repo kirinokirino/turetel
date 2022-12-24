@@ -1,6 +1,6 @@
 use glam::Vec2;
 
-use crate::geometry::Line;
+use crate::geometry::{Line, Triangle};
 
 #[derive(Debug, Copy, Clone)]
 pub enum Command {
@@ -24,14 +24,16 @@ impl Turtle {
         }
     }
 
+    fn forward(&self) -> Vec2 {
+        Vec2::from_angle((self.rotation as f32).to_radians())
+    }
+
     pub fn apply_command(&mut self, command: Command) {
         match command {
             Command::Move(forward_distance) => {
                 let start = self.position;
                 println!("Turtle moved {forward_distance}");
-                let forward = Vec2::from_angle((self.rotation as f32).to_radians())
-                    * (forward_distance as f32);
-                self.position += forward;
+                self.position += self.forward() * (forward_distance as f32);
                 let end = self.position;
                 self.path.push(Line::new(start, end));
             }
@@ -50,12 +52,25 @@ impl Turtle {
         }
     }
 
+    pub fn turtle_triangle(&self) -> Triangle {
+        let triangle_size = 5.0;
+        let heading = self.forward() * triangle_size;
+        let side1 = Vec2::from_angle((90.0f32).to_radians()).rotate(self.forward()) * triangle_size;
+        let side2 =
+            Vec2::from_angle((270.0f32).to_radians()).rotate(self.forward()) * triangle_size;
+        Triangle::new(
+            self.position + heading,
+            self.position + side1,
+            self.position + side2,
+        )
+    }
+
     pub fn draw(&self) -> Vec<Vec2> {
         let mut points = Vec::new();
         for line in &self.path {
             points.extend(line.solid().iter())
         }
-        // TODO : Draw turtle
+        points.extend(self.turtle_triangle().solid_color());
         points
     }
 }
