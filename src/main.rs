@@ -1,5 +1,9 @@
 #![warn(clippy::nursery)]
 
+mod common;
+mod geometry;
+mod graphics;
+mod math;
 mod script;
 mod turtle;
 mod window;

@@ -72,10 +72,15 @@ impl Window {
     }
 
     pub fn draw(&mut self) {
-        for i in self.buffer.iter_mut() {
-            *i = 0; // write something more funny here!
-        }
+        let points = self.turtle.draw();
 
+        for point in points.iter().filter(|p| {
+            p.x > 0.0 && p.x < self.width as f32 && p.y > 0.0 && p.y < self.height as f32
+        }) {
+            let x = point.x as i32;
+            let y = (point.y as i32) * (self.width as i32);
+            self.buffer[(x + y) as usize] = u32::MAX;
+        }
         // We unwrap here as we want this code to exit if it fails. Real applications may want to handle this in a different way
         self.window
             .update_with_buffer(&self.buffer, self.width, self.height)
