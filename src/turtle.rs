@@ -10,15 +10,17 @@ pub enum Command {
 
 #[derive(Debug)]
 pub struct Turtle {
+    starting_position: Vec2,
     position: Vec2,
     rotation: i32,
     path: Vec<Line>,
 }
 
 impl Turtle {
-    pub const fn new(position: Vec2) -> Self {
+    pub const fn new(starting_position: Vec2) -> Self {
         Self {
-            position,
+            starting_position,
+            position: starting_position,
             rotation: 0,
             path: Vec::new(),
         }
@@ -26,6 +28,12 @@ impl Turtle {
 
     fn forward(&self) -> Vec2 {
         Vec2::from_angle((self.rotation as f32).to_radians())
+    }
+
+    pub fn reset(&mut self) {
+        self.path = Vec::new();
+        self.position = self.starting_position;
+        self.rotation = 0;
     }
 
     pub fn apply_command(&mut self, command: Command) {

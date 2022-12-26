@@ -40,13 +40,8 @@ impl Window {
     }
 
     pub fn run(&mut self) {
-        let commands = vec![
-            Command::Move(50),
-            Command::Turn(90),
-            Command::Move(50),
-            Command::Turn(90),
-        ];
-        self.init(Some(&commands));
+        let commands = None;
+        self.init(commands);
 
         while !self.should_stop && self.window.is_open() {
             self.update();
@@ -57,13 +52,16 @@ impl Window {
     pub fn init(&mut self, commands: Option<&[Command]>) {
         if let Some(commands) = commands {
             self.turtle.apply_commands(commands);
+        } else {
+            self.turtle.apply_commands(&self.script.parse());
         }
     }
 
     pub fn update(&mut self) {
         if self.elapsed_updates % 120 == 0 {
-            if self.script.update() {
-                println!("Updated script!");
+            if let Some(updated_commands) = self.script.update() {
+                self.turtle.reset();
+                self.turtle.apply_commands(&updated_commands);
             }
         }
         if self.window.is_key_down(Key::Escape) {
@@ -72,6 +70,7 @@ impl Window {
     }
 
     pub fn draw(&mut self) {
+        self.buffer.fill(0);
         let points = self.turtle.draw();
 
         for point in points.iter().filter(|p| {
