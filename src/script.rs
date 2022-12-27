@@ -3,7 +3,7 @@ use anyhow::Result;
 use std::fs::{self, read_to_string};
 use std::time::SystemTime;
 
-use crate::turtle::Command;
+use crate::turtle::{Command, Scope};
 pub struct Script {
     path_to_watch: String,
     last_modified: SystemTime,
@@ -29,11 +29,15 @@ impl Script {
         {
             let mut command = None;
             let mut argument = None;
-            for (i, word) in line.split_ascii_whitespace().enumerate() {
+            let indentation = count_indentation(line);
+
+            let words = line.split_whitespace();
+            for (i, word) in words.enumerate() {
                 match i {
                     0 => match word {
-                        "move" => command = Some(Command::Move(0)),
-                        "turn" => command = Some(Command::Turn(0)),
+                        "move" => command = Some(Command::Move(Scope(indentation), 0)),
+                        "turn" => command = Some(Command::Turn(Scope(indentation), 0)),
+                        "repeat" => command = Some(Command::Repeat(Scope(indentation), 0)),
                         _ => (),
                     },
                     1 => argument = Some((word.parse::<i32>()).unwrap()),
@@ -44,8 +48,9 @@ impl Script {
                 panic!("Error parsing script on line {i}");
             }
             commands.push(match command.unwrap() {
-                Command::Move(_) => Command::Move(argument.unwrap()),
-                Command::Turn(_) => Command::Turn(argument.unwrap()),
+                Command::Move(scope, _) => Command::Move(scope, argument.unwrap()),
+                Command::Turn(scope, _) => Command::Turn(scope, argument.unwrap()),
+                Command::Repeat(scope, _) => Command::Repeat(scope, argument.unwrap()),
             });
         }
         commands
@@ -67,4 +72,15 @@ impl Script {
         // TODO return err instead of panicing.
         Ok(metadata.modified()?)
     }
+}
+
+pub fn count_indentation(line: &str) -> usize {
+    let mut count = 0;
+    for character in line.chars() {
+        if character != '\t' {
+            break;
+        }
+        count += 1;
+    }
+    count
 }

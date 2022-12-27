@@ -1,29 +1,20 @@
-move 50 
 turn 90
-move 50
-turn 90
-move 10
-turn 12
-move 10
-turn 12
-move 10
-turn 12
-move 10
-turn 12
-move 10
-turn 12
-move 10
-turn 12
-move 10
-turn 12
-move 10
-turn 12
-move 10
-turn 12
-move 10
-turn 12
-move 10
-turn 12
-move 10
-turn 12
-move 10
+	turn 10
+	move 10
+	repeat 10
+	turn 90
+	repeat 10
+turn 180
+move 100
+	turn -20
+	move 7
+	repeat 10
+	turn -50
+	repeat 3
+turn 60
+move 100
+	turn -20
+	move 4
+	repeat 4
+	turn 96
+	repeat 90
